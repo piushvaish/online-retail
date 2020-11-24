@@ -5,103 +5,116 @@ import streamlit as st
 
 
 @st.cache
-def plot_monthly_revenue(tx_revenue):
-    # X and Y axis inputs for Plotly graph. We use Scatter for line graphs
+def plot_scatter(df, col1, col2, color, title, xaxis_title, yaxis_title):
     plot_data = [
         go.Scatter(
-            x=tx_revenue['InvoiceYearMonth'],
-            y=tx_revenue['Revenue'],
-            marker_color='crimson'
+            x=df[col1],
+            y=df[col2],
+            line=dict(color=color,
+                      width=4,
+                      dash='dash')
         )
     ]
 
     plot_layout = go.Layout(
-        xaxis={"type": "category"},
-        #title='Monthly Revenue',
-        xaxis_tickangle=90
-    )
-    return go.Figure(data=plot_data, layout=plot_layout)
-
-
-@st.cache
-def plot_monthly_growth_rate(df):
-    # using pct_change() function to see monthly percentage change
-    df['MonthlyGrowth'] = df['Revenue'].pct_change()
-
-    # visualization - line graph
-    plot_data = [
-        go.Scatter(
-            x=df.query("InvoiceYearMonth < 201112")['InvoiceYearMonth'],
-            y=df.query("InvoiceYearMonth < 201112")['MonthlyGrowth'],
-        )
-    ]
-
-    plot_layout = go.Layout(
-        xaxis={"type": "category"},
-        #title='Montly Growth Rate',
-        xaxis_tickangle=90
-
-    )
-
-    return go.Figure(data=plot_data, layout=plot_layout)
-
-
-@st.cache
-def plot_monthly_active(df):
-    # plotting the output
-    plot_data = [
-        go.Bar(
-            x=df['InvoiceYearMonth'],
-            y=df['CustomerID'],
-            marker_color='rgb(158,202,225)',
-            marker_line_color='rgb(8,48,107)',
-            marker_line_width=1.5,
-            opacity=0.6,
-        )
-    ]
-
-    plot_layout = go.Layout(
-        xaxis={"type": "category"},
-        #title='Monthly Active Customers (United Kingdom)',
-        xaxis_tickangle=90
-    )
+        xaxis=dict(
+            type="category",
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=2,
+            tickangle=90,
+            ticks='outside',
+            tickfont=dict(
+                family='Arial',
+                size=12,
+                color='rgb(82, 82, 82)',
+            ),
+        ),
+        yaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=2,
+            ticks='outside',
+            tickfont=dict(
+                family='Arial',
+                size=12,
+                color='rgb(82, 82, 82)',
+            ),
+        ),
+        autosize=True,
+        margin=dict(
+            autoexpand=False,
+            l=100,
+            r=20,
+            t=110,
+        ),
+        showlegend=False,
+        plot_bgcolor='white',
+        title=title,
+        xaxis_title=xaxis_title,
+        yaxis_title=yaxis_title)
 
     return go.Figure(data=plot_data, layout=plot_layout)
 
 
 @st.cache
-def plot_monthly_order_count(df):
-    # plot
+def plot_bar(df, col1, col2, name, color, title, xaxis_title, yaxis_title):
     plot_data = [
         go.Bar(
-            x=df['InvoiceYearMonth'],
-            y=df['Quantity'],
-            marker_color='lightsalmon'
+            x=df[col1],
+            y=df[col2],
+            textposition='outside',
+            name=name,
+            marker_color=color
         )
     ]
 
     plot_layout = go.Layout(
-        xaxis={"type": "category"}  # ,
-        # title='Monthly Total # of Order'
-    )
+        xaxis=dict(
+            type="category",
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=2,
+            tickangle=90,
+            ticks='outside',
+            tickfont=dict(
+                family='Arial',
+                size=12,
+                color='rgb(82, 82, 82)',
+            ),
+        ),
+        yaxis=dict(
+            showline=True,
+            showgrid=False,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=2,
+            ticks='outside',
+            tickfont=dict(
+                family='Arial',
+                size=12,
+                color='rgb(82, 82, 82)'
+            ),
+        ),
+        autosize=True,
+        margin=dict(
+            autoexpand=False,
+            l=100,
+            r=20,
+            t=110,
+        ),
+        showlegend=False,
+        plot_bgcolor='white',
+        title=title,
+        xaxis_title=xaxis_title,
+        yaxis_title=yaxis_title)
 
     return go.Figure(data=plot_data, layout=plot_layout)
 
 
-@st.cache
-def plot_average_monthly_revenue(df):
-    # plot the bar chart
-    plot_data = [
-        go.Bar(
-            x=df['InvoiceYearMonth'],
-            y=df['Revenue'],
-            marker_color='royalblue',
-            opacity=0.6,
-        )
-    ]
-
-    plot_layout = go.Layout(
-        xaxis={"type": "category"}  # ,
-        #title='Monthly Order Average'
-    )
-    return go.Figure(data=plot_data, layout=plot_layout)
