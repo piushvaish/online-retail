@@ -33,7 +33,7 @@ def display_metrics():
         st.dataframe(df.head(10))
 
     #st.subheader("Monthly Revenue")
-    st.markdown("""<h4 style="color:#26608e;"> Revenue = Active Customer Count * Order Count * Average Revenue per Order</h2>""", unsafe_allow_html=True)
+    st.markdown("""<h4 style="color:#26608e;"> Revenue = Active Customer Count * Order Count * Average Revenue per Order</h4>""", unsafe_allow_html=True)
     df_revenue = monthly_revenue(df)
     fig = plot_scatter(df_revenue, 'month_year', 'payment_value',
                        'firebrick', 'Monthly Revenue', 'Month - Year', 'R$')

@@ -13,6 +13,7 @@ from streamlit_blocks.retention import display_retention
 from streamlit_blocks.customer_acquisition import display_customer_acquisition
 from streamlit_blocks.customer_funnel import display_customer_funnel
 from streamlit_blocks.customer_sankey import display_customer_sankey
+from streamlit_blocks.segmentation import display_segmentation
 
 
 
@@ -43,12 +44,8 @@ if navigation == "Customer Retention / Churn Rate":
 
 
 if navigation == "Customer Segmentation":
-    st.header("Customer Segmentation")
-    st.subheader("Using RFM (Recency - Frequency - Monetary Value) Clustering")
-    st.write("Low Value: Customers who are less active than others, \n not very frequent buyer/visitor and generates very low - zero - maybe negative revenue.")
-    st.write(
-        "Mid Value: Using platform fairly frequent and generates moderate revenue.")
-    st.write("High Value: High Revenue, Frequency and low Inactivity.")
+    display_segmentation()
+    
 
 
 if navigation == "Customer Acquisition Detail":
