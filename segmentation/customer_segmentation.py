@@ -1,112 +1,96 @@
-# import libraries
-from datetime import datetime, timedelta
 import pandas as pd
-%matplotlib inline
-import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
-from __future__ import division
-
-import plotly.plotly as py
-import plotly.offline as pyoff
-import plotly.graph_objs as go
-
-#inititate Plotly
-pyoff.init_notebook_mode()
-
-#load our data from CSV
-tx_data = pd.read_csv('data.csv')
-
-#convert the string date field to datetime
-tx_data['InvoiceDate'] = pd.to_datetime(tx_data['InvoiceDate'])
-
-#we will be using only UK data
-tx_uk = tx_data.query("Country=='United Kingdom'").reset_index(drop=True)
-
-# Calculate Recency
-
-#create a generic user dataframe to keep CustomerID and new segmentation scores
-tx_user = pd.DataFrame(tx_data['CustomerID'].unique())
-tx_user.columns = ['CustomerID']
-
-#get the max purchase date for each customer and create a dataframe with it
-tx_max_purchase = tx_uk.groupby('CustomerID').InvoiceDate.max().reset_index()
-tx_max_purchase.columns = ['CustomerID','MaxPurchaseDate']
-
-#we take our observation point as the max invoice date in our dataset
-tx_max_purchase['Recency'] = (tx_max_purchase['MaxPurchaseDate'].max() - tx_max_purchase['MaxPurchaseDate']).dt.days
-
-#merge this dataframe to our new user dataframe
-tx_user = pd.merge(tx_user, tx_max_purchase[['CustomerID','Recency']], on='CustomerID')
-
-tx_user.head()
-
-#plot a recency histogram
-
-plot_data = [
-    go.Histogram(
-        x=tx_user['Recency']
-    )
-]
-
-plot_layout = go.Layout(
-        title='Recency'
-    )
-fig = go.Figure(data=plot_data, layout=plot_layout)
-pyoff.iplot(fig)
-
-
-## Elbow Method. Elbow Method simply tells the optimal cluster number for optimal inertia
+import datetime as dt
+from scipy import stats
+# Fetaure Selection
+from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-
-sse={}
-tx_recency = tx_user[['Recency']]
-for k in range(1, 10):
-    kmeans = KMeans(n_clusters=k, max_iter=1000).fit(tx_recency)
-    tx_recency["clusters"] = kmeans.labels_
-    sse[k] = kmeans.inertia_ 
-plt.figure()
-plt.plot(list(sse.keys()), list(sse.values()))
-plt.xlabel("Number of cluster")
-plt.show()
-
-#build 4 clusters for recency and add it to dataframe
-kmeans = KMeans(n_clusters=4)
-kmeans.fit(tx_user[['Recency']])
-tx_user['RecencyCluster'] = kmeans.predict(tx_user[['Recency']])
-
-#function for ordering cluster numbers
-def order_cluster(cluster_field_name, target_field_name,df,ascending):
-    new_cluster_field_name = 'new_' + cluster_field_name
-    df_new = df.groupby(cluster_field_name)[target_field_name].mean().reset_index()
-    df_new = df_new.sort_values(by=target_field_name,ascending=ascending).reset_index(drop=True)
-    df_new['index'] = df_new.index
-    df_final = pd.merge(df,df_new[[cluster_field_name,'index']], on=cluster_field_name)
-    df_final = df_final.drop([cluster_field_name],axis=1)
-    df_final = df_final.rename(columns={"index":cluster_field_name})
-    return df_final
-
-tx_user = order_cluster('RecencyCluster', 'Recency',tx_user,False)
-
-## Frequency
-#get order counts for each user and create a dataframe with it
-tx_frequency = tx_uk.groupby('CustomerID').InvoiceDate.count().reset_index()
-tx_frequency.columns = ['CustomerID','Frequency']
-
-#add this data to our main dataframe
-tx_user = pd.merge(tx_user, tx_frequency, on='CustomerID')
-
-#plot the histogram
-plot_data = [
-    go.Histogram(
-        x=tx_user.query('Frequency < 1000')['Frequency']
-    )
-]
-
-plot_layout = go.Layout(
-        title='Frequency'
-    )
-fig = go.Figure(data=plot_data, layout=plot_layout)
-pyoff.iplot(fig)
+import streamlit as st
 
 
+def create_rfm(df):
+    pin_date = max(df.order_purchase_timestamp) + dt.timedelta(1)
+    # Membuat dataframe RFM
+    rfm = df.groupby('customer_unique_id').agg({
+        'order_purchase_timestamp': lambda x: (pin_date - x.max()).days,
+        'order_item_id': 'count',
+        'payment_value': 'sum'})
+
+    # Merubah nama kolom
+    rfm.rename(columns={'order_purchase_timestamp': 'Recency',
+                        'order_item_id': 'Frequency',
+                        'payment_value': 'Monetary'}, inplace=True)
+    return rfm
+
+
+def remove_outliers(df):
+    outliers1_drop = df[(df['Monetary'] > 1500)].index
+    df.drop(outliers1_drop, inplace=True)
+    return df
+
+@st.cache
+def create_groups(df):
+    # Create customer groups based on Recency, Frequency, and Monetary
+    # Because Recency if the fewer days the better, it will make the order in reverse
+
+    r_labels = range(3, 0, -1)
+    r_groups = pd.qcut(df.Recency, q=3, labels=r_labels).astype('int')
+
+    # Because the Frequency is very much at the value of 1, you cannot use qcut,
+    # because the value will be skewed to the most
+
+    f_groups = pd.qcut(df.Frequency.rank(method='first'), 3).astype('str')
+    #df['F'] = np.where((df['Frequency'] != 1) & (df['Frequency'] != 2), 3, df.Frequency)
+
+    m_labels = range(1, 4)
+    m_groups = pd.qcut(df.Monetary, q=3, labels=m_labels).astype('int')
+
+    # Create a column based on the group that has been created
+
+    df['R'] = r_groups.values
+    df['F'] = f_groups.values
+    df['M'] = m_groups.values
+
+    # Change the input column F to categorical
+
+    df['F'] = df['F'].replace({'(0.999, 30650.0]': 1,
+                               '(30650.0, 61299.0]': 2,
+                               '(61299.0, 91948.0]': 3}).astype('int')
+
+    # Combine these three columns
+    df['RFM_Segment'] = df.apply(lambda x: str(
+        x['R']) + str(x['F']) + str(x['M']), axis=1)
+    df['RFM_Score'] = df[['R', 'F', 'M']].sum(axis=1)
+
+    # Create labels based on RFM_Score
+    score_labels = ['Low', 'Medium', 'High']
+    score_groups = pd.qcut(
+        df.RFM_Score, q=3, labels=score_labels).astype('object')
+
+    df['RFM_Level'] = score_groups.values
+    return df
+
+@st.cache
+def normalize_data(df):
+
+    df_log = df[['Recency', 'Monetary']].apply(np.log, axis=1).round(3)
+    df_log['Frequency'] = stats.boxcox(df['Frequency'])[0]
+    return df_log
+
+def scaled_data(df_log, df):
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df_log)
+    # Create a new dataframe after scaling
+    df_scaled = pd.DataFrame(df_scaled, index = df.index, columns = df_log.columns)
+    return df_scaled
+    
+@st.cache
+def create_clusters(df, rfm):
+    #Choose n_clusters = 4 according to the elbow method
+    clus = KMeans(n_clusters= 4, n_init=10, init= 'k-means++', max_iter= 300)
+    clus.fit(df)
+    # Enter everything into the scaling data
+    df['K_Cluster'] = clus.labels_
+    df['RFM_Level'] = rfm.RFM_Level
+    df.reset_index(inplace = True)
+    return df
