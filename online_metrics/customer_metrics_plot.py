@@ -1,4 +1,3 @@
-import seaborn as sns
 import matplotlib.pyplot as plt
 from plotly import graph_objs as go
 import streamlit as st
