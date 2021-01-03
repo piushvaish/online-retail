@@ -12,7 +12,7 @@ def display_home():
     and ship them directly to the customers using Olist logistics partners.
     """ , unsafe_allow_html=True)
 
-    image = Image.open('olist_images/olist_webpage.png')
+    image = Image.open('olist_images/olist_webpage.PNG')
     st.image(image, caption='https://olist.com/', use_column_width=True)
 
     st.markdown(""" 
