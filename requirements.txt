@@ -11,7 +11,7 @@ backcall==0.2.0
 base58==2.0.1
 bleach==3.2.1
 blinker==1.4
-boto3==1.16.9
+boto3==1.16.47
 botocore==1.19.9
 cachetools==4.1.1
 category-encoders==2.2.2
