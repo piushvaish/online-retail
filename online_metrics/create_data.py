@@ -10,13 +10,14 @@ AWS_S3_BUCKET = json.loads(get_secret())['AWS_S3_BUCKET']
 S3_KEY = json.loads(get_secret())['AWS_ACCESS_KEY_ID']
 S3_SECRET = json.loads(get_secret())['AWS_SECRET_ACCESS_KEY']
 
-session = boto3.session(
-# Let's use Amazon S3
-s3 = boto3.client(region_name = 'eu-west-1', 
-                aws_access_key_id=S3_KEY, 
-                aws_secret_access_key=S3_SECRET)
 
-s3 = session.resource('s3')
+session = boto3.session(
+      region_name = 'eu-west-1',  
+      aws_access_key_id=S3_KEY, 
+      aws_secret_access_key=S3_SECRET)
+
+# now instantiate the services
+myclient = session.resource('s3')
 
 @st.cache
 def create_dataframe():
