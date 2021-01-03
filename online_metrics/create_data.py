@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import boto3
-from online_metrics.online_metrics import secrets
+from olist_images.secrets import get_secret
 import json
 
-_get_secret = json.loads(secrets.get_secret())
+_get_secret = json.loads(get_secret())
 
 print(_get_secret)
 AWS_S3_BUCKET = _get_secret.get('AWS_S3_BUCKET')
