@@ -5,11 +5,10 @@ import boto3
 from olist_images.secrets import get_secret
 import json
 
-_get_secret = json.loads(get_secret())
 
-AWS_S3_BUCKET = _get_secret.get('AWS_S3_BUCKET')
-AWS_ACCESS_KEY_ID = _get_secret.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = _get_secret.get('AWS_SECRET_ACCESS_KEY')
+AWS_S3_BUCKET = json.loads(get_secret())['AWS_S3_BUCKET']
+AWS_ACCESS_KEY_ID = json.loads(get_secret())['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = json.loads(get_secret())['AWS_SECRET_ACCESS_KEY']
 
 
 # Let's use Amazon S3
