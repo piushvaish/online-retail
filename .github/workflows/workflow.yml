@@ -1,4 +1,4 @@
-name: connect data
+name: AWS_S3_BUCKET
 
 on:
   push:
