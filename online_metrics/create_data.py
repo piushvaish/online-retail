@@ -12,7 +12,7 @@ AWS_SECRET_ACCESS_KEY = json.loads(get_secret())['AWS_SECRET_ACCESS_KEY']
 
 
 # Let's use Amazon S3
-s3 = boto3.client('s3')
+s3 = boto3.resource('s3')
 
 
 @st.cache
