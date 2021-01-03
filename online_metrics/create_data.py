@@ -4,7 +4,8 @@ import streamlit as st
 import boto3
 
 # Let's use Amazon S3
-s3 = boto3.resource('s3')
+s3 = boto3.resource('s3', aws_access_key_id=secrets.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=secrets.AWS_SECRET_ACCESS_KEY)
 
 
 @st.cache
