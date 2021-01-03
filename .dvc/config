@@ -1,5 +1,0 @@
-[core]
-    analytics = false
-    remote = e-commerce-data
-['remote "e-commerce-data"']
-    url = gdrive://1oRhWerHCqLAbtzuHbJ_WWrq0dbuwSEPT
