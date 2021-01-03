@@ -1,16 +1,17 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
+import boto
 
 
 @st.cache
 def create_dataframe():
     # loading data
-    customers_ = pd.read_csv("data/olist_customers_dataset.csv")
-    order_items_ = pd.read_csv("data/olist_order_items_dataset.csv")
-    order_payments_ = pd.read_csv("data/olist_order_payments_dataset.csv")
-    orders_ = pd.read_csv("data/olist_orders_dataset.csv")
-    products_ = pd.read_csv("data/olist_products_dataset.csv")
+    customers_ = pd.read_csv("s3://pv-ecommerce-data/olist_customers_dataset.csv")
+    order_items_ = pd.read_csv("s3://pv-ecommerce-data/olist_order_items_dataset.csv")
+    order_payments_ = pd.read_csv("s3://pv-ecommerce-data/olist_order_payments_dataset.csv")
+    orders_ = pd.read_csv("s3://pv-ecommerce-data/olist_orders_dataset.csv")
+    products_ = pd.read_csv("s3://pv-ecommerce-data/olist_products_dataset.csv")
 
     # dataframe
     df1 = order_payments_.merge(order_items_, on='order_id')

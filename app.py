@@ -6,6 +6,7 @@ import numpy as np
 import random
 import streamlit as st
 from pathlib import Path
+import boto
 
 from streamlit_blocks.home import display_home
 from streamlit_blocks.simple_metrics import display_metrics
@@ -18,7 +19,7 @@ from streamlit_blocks.basket_optimization import display_basket
 from streamlit_blocks.animated_bubble_plot import display_bubble_plot
 
 # data
-data_folder = Path("data/")
+data_folder = Path("s3://pv-ecommerce-data/")
 tx_data = pd.read_csv(data_folder / 'data2.csv',
                       encoding="utf-8", engine='python')
 
