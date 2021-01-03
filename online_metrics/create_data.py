@@ -12,9 +12,10 @@ AWS_SECRET_ACCESS_KEY = json.loads(get_secret())['AWS_SECRET_ACCESS_KEY']
 
 
 # Let's use Amazon S3
-s3 = boto3.resource('s3', aws_access_key_id= AWS_ACCESS_KEY_ID,
+s3 = boto3.client('s3', aws_access_key_id= AWS_ACCESS_KEY_ID,
     aws_secret_access_key= AWS_SECRET_ACCESS_KEY,  region_name='eu-west-1')
 
+s3 = boto3.resource('s3')
 
 @st.cache
 def create_dataframe():
