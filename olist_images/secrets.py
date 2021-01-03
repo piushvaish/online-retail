@@ -10,6 +10,7 @@ def get_secret():
 
     secret_name = "pv-s3-online-data"
     region_name = "eu-west-1"
+    text_secret ={}
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -51,8 +52,8 @@ def get_secret():
         # Decrypts secret using the associated KMS CMK.
         # Depending on whether the secret is a string or binary, one of these fields will be populated.
         if 'SecretString' in get_secret_value_response:
-            secret = get_secret_value_response['SecretString']
+            text_secret = get_secret_value_response['SecretString']
         else:
             decoded_binary_secret = base64.b64decode(get_secret_value_response['SecretBinary'])
     
-    return secret
+    return text_secret
