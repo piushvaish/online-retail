@@ -6,6 +6,7 @@ import secrets
 import json
 
 _get_secret = json.loads(secrets.get_secret())
+print(_get_secret)
 AWS_S3_BUCKET = _get_secret.get('AWS_S3_BUCKET')
 AWS_ACCESS_KEY_ID = _get_secret.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = _get_secret.get('AWS_SECRET_ACCESS_KEY')
