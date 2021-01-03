@@ -6,7 +6,7 @@ import numpy as np
 import random
 import streamlit as st
 from pathlib import Path
-import boto3
+
 
 from streamlit_blocks.home import display_home
 from streamlit_blocks.simple_metrics import display_metrics
