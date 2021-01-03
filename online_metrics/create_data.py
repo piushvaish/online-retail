@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import streamlit as st
 import boto3
-from .. online_metrics import secrets
+from online_metrics.online_metrics import secrets
 import json
 
 _get_secret = json.loads(secrets.get_secret())
